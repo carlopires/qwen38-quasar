@@ -79,7 +79,7 @@ def test_selection_is_the_argmin_of_the_deployed_error() -> None:
     FP8 scale, not the ideal floating-point scale.
     """
     torch.manual_seed(11)
-    w = (torch.randn(1, GROUP) * 0.05)
+    w = torch.randn(1, GROUP) * 0.05
     w[0, 5] = 1.7  # an outlier, so clipping candidates genuinely differ
     h = torch.ones_like(w)
 
@@ -104,7 +104,7 @@ def test_scoring_uses_rounded_scale_not_the_ideal_scale() -> None:
     trials = 40
     for _ in range(trials):
         w = torch.randn(1, GROUP) * 0.05
-        w[0, torch.randint(0, GROUP, (1,)).item()] *= 25.0
+        w[0, int(torch.randint(0, GROUP, (1,)).item())] *= 25.0
         h = torch.ones_like(w)
         global_scale = compute_global_scale(w)
 
@@ -113,9 +113,7 @@ def test_scoring_uses_rounded_scale_not_the_ideal_scale() -> None:
             for f in candidate_grid().tolist()
         ]
         ideal_only = [
-            _reference_group_error(
-                w.flatten(), h.flatten(), float(f), torch.ones(1)
-            )
+            _reference_group_error(w.flatten(), h.flatten(), float(f), torch.ones(1))
             for f in candidate_grid().tolist()
         ]
         if min(range(len(deployed)), key=deployed.__getitem__) != min(
@@ -200,13 +198,11 @@ def test_saliency_shapes_the_fit() -> None:
     uniform = select_scales(
         w, torch.ones_like(w), QuasarConfig(candidate_min=1.0, candidate_max=1.0)
     )
-    uniform_scale = (
-        uniform.weight_scale.to(torch.float32)[0, 0] / uniform.weight_global_scale.reshape(())
-    )
+    uniform_scale = uniform.weight_scale.to(torch.float32)[
+        0, 0
+    ] / uniform.weight_global_scale.reshape(())
     uniform_reconstructed = q * uniform_scale
-    assert (reconstructed[7] - w[0, 7]).abs() <= (
-        uniform_reconstructed[7] - w[0, 7]
-    ).abs() + 1e-9
+    assert (reconstructed[7] - w[0, 7]).abs() <= (uniform_reconstructed[7] - w[0, 7]).abs() + 1e-9
 
 
 def _group_values(result) -> torch.Tensor:

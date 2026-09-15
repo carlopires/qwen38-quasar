@@ -1,0 +1,12 @@
+{
+  "source_repo": "nerkyor/Qwen3.8-27B-EfficientThink-Uncensored-K3-Opus5-Grok4.6-GPT5.6Sol-SFT-SimPO-DFlash2",
+  "revision": "882e1af3b8f5844f3b3163b132e343c06e91908f",
+  "path": "BF16/config.json",
+  "note": "Schema/architecture fixture only. No model weights are stored in this repository.",
+  "sha256": "a0ef2afe637ca344cd61a6320680d735940cadfd4fd8538ac3ce83c9dba64ef0",
+  "num_hidden_layers": 64,
+  "layer_type_counts": {
+    "linear_attention": 48,
+    "full_attention": 16
+  }
+}

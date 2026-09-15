@@ -1,0 +1,45 @@
+{
+  "generated": "2026-09-15T12:14:04+00:00",
+  "sources": {
+    "efficientthink": {
+      "kind": "model",
+      "repo": "nerkyor/Qwen3.8-27B-EfficientThink-Uncensored-K3-Opus5-Grok4.6-GPT5.6Sol-SFT-SimPO-DFlash2",
+      "revision": "882e1af3b8f5844f3b3163b132e343c06e91908f",
+      "role": "teacher + student initialization (BF16/, not GGUF)"
+    },
+    "ninfer": {
+      "kind": "repo",
+      "note": "Local checkout is ~/code/ninfer with the upstream remote named 'carlo'.",
+      "repo": "carlopires/ninfer-rtx5090-mobile",
+      "revision": "895de784034d5a28ee6a65d92dec3774b69edffd",
+      "role": ".ninfer conversion, runtime, serving"
+    },
+    "open_perfectblend": {
+      "kind": "dataset",
+      "repo": "mlabonne/open-perfectblend",
+      "revision": "af60f3c18201652a83a93f46fcfee1b646ba3df7",
+      "role": "QAD baseline dataset (milestone 1 only)"
+    },
+    "quasar_paper": {
+      "extra": {
+        "abs_url": "https://arxiv.org/abs/2608.13966",
+        "arxiv": "2608.13966",
+        "html_url": "https://arxiv.org/html/2608.13966",
+        "note": "No official source-code repository was public at implementation time. The algorithm is implemented independently from the paper.",
+        "retrieved": "2026-09-15",
+        "title": "QUASAR: Lowering the Loss Floor of Quantization-Aware Training with Loss-Aware Reconstruction"
+      },
+      "kind": "paper",
+      "repo": "arXiv:2608.13966",
+      "revision": "2026-09-15",
+      "role": "algorithmic authority"
+    },
+    "quasar_reference": {
+      "kind": "model",
+      "note": "Never used to initialize the student. Only config.json is read, to verify quantization_config, compressed-tensors metadata, tensor naming and ignored modules.",
+      "repo": "QUASAR-QAT/Qwen3.8-27B-QUASAR-NVFP4",
+      "revision": "cfd1460322b9d8367a4ab13564a2182d50852d60",
+      "role": "schema oracle only"
+    }
+  }
+}

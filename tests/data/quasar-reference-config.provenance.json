@@ -1,0 +1,27 @@
+{
+  "source_repo": "QUASAR-QAT/Qwen3.8-27B-QUASAR-NVFP4",
+  "revision": "cfd1460322b9d8367a4ab13564a2182d50852d60",
+  "path": "config.json",
+  "note": "Schema oracle only. Only quantization_config is retained; no weights are copied and this checkpoint is never used to initialize the student.",
+  "sha256": "4a602978ea802d91171d3c5a8b99c5a23900ed474289133d9d0193a35ce3206b",
+  "quantization_config_keys": [
+    "config_groups",
+    "format",
+    "global_compression_ratio",
+    "ignore",
+    "kv_cache_scheme",
+    "producer",
+    "quant_method",
+    "quantization_status",
+    "sparsity_config",
+    "transform_config"
+  ],
+  "ignore": [
+    "lm_head",
+    "re:.*visual.*",
+    "re:.*mtp.*",
+    "re:.*embed_vision.*",
+    "re:.*embed_audio.*",
+    "re:.*vision_embedder.*"
+  ]
+}

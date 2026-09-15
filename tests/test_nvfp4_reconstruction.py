@@ -12,7 +12,6 @@ from __future__ import annotations
 import pytest
 import torch
 
-from qwen38_quasar.quantization.e2m1 import CODEBOOK_MAGNITUDES
 from qwen38_quasar.quantization.nvfp4 import (
     E2M1_MAX,
     FP8_E4M3_MAX,
@@ -59,10 +58,10 @@ def test_global_scale_survives_an_all_zero_tensor() -> None:
 
 def test_pack_layout_matches_oracle() -> None:
     """Even columns in the low nibble, odd columns in the high nibble."""
-    values = torch.tensor(list(CODEBOOK_MAGNITUDES) + [0.0])[None, :].repeat(3, 1)[:, :8]
-    # build a valid 2-D fp4 tensor with an even column count
-    row = torch.tensor([0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0, -0.0, -0.5, -1.0, -1.5,
-                        -2.0, -3.0, -4.0, -6.0])
+    # a valid 2-D fp4 tensor with an even column count
+    row = torch.tensor(
+        [0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0, -0.0, -0.5, -1.0, -1.5, -2.0, -3.0, -4.0, -6.0]
+    )
     fp4 = row.repeat(4, 1)
     mine = pack_e2m1(_encode_values(fp4))
     theirs = pack_fp4_to_uint8(fp4.clone())
@@ -87,7 +86,6 @@ def test_pack_unpack_round_trip() -> None:
 
 def test_unpack_matches_oracle() -> None:
     """Our unpacking agrees with compressed_tensors' unpacking."""
-    from qwen38_quasar.quantization.e2m1 import encode
 
     row = torch.tensor([0.0, -0.0, 6.0, -6.0, 0.5, -1.5, 3.0, -4.0])
     fp4 = row.repeat(2, 1)

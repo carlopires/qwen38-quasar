@@ -69,9 +69,7 @@ def compute_global_scale(weight: torch.Tensor) -> torch.Tensor:
     max_abs = weight.abs().amax().to(torch.float32)
     max_abs = max_abs.clamp(min=torch.finfo(torch.float32).tiny)
     global_scale = FP8_E4M3_MAX * E2M1_MAX / max_abs
-    global_scale = torch.nan_to_num(
-        global_scale, nan=1.0, posinf=1.0, neginf=1.0
-    )
+    global_scale = torch.nan_to_num(global_scale, nan=1.0, posinf=1.0, neginf=1.0)
     return global_scale.to(torch.float32).reshape(1)
 
 

@@ -300,12 +300,9 @@ def select_scales(
     baseline_error, _ = score(base_codes, base_scale)
 
     candidates = config.candidates().tolist()
-    best_error: torch.Tensor | None = None
-    best_codes: torch.Tensor | None = None
-    best_scale: torch.Tensor | None = None
-    best_index: torch.Tensor | None = None
 
-    for index, factor in enumerate(candidates):
+    def evaluate(factor: float) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Run steps 1-5 for one clipping candidate: codes, ideal scale, error."""
         alpha = torch.full_like(group_max, float(factor))
         raw_scale = (alpha * group_max / E2M1_MAX).clamp(min=_EPS)
 
@@ -314,33 +311,25 @@ def select_scales(
 
         # 2. saliency-weighted least-squares refit of the group scale, using the
         #    E2M1 *values* of the assigned codes
-        ideal_scale = (
-            _weighted_scale(w, decode(codes), h) if config.refit else raw_scale
-        )
-        saturation.update(ideal_scale * gs_scalar)
+        ideal = _weighted_scale(w, decode(codes), h) if config.refit else raw_scale
+        saturation.update(ideal * gs_scalar)
 
         # 3-5. FP8-round, reconstruct with the deployed scale, score
-        err, _ = score(codes, ideal_scale)
+        err, _ = score(codes, ideal)
+        return codes, ideal, err
 
-        if best_error is None:
-            best_error = err
-            best_codes = codes
-            best_scale = ideal_scale
-            best_index = torch.full(
-                (out_features, n_groups), index, dtype=torch.long, device=device
-            )
-            continue
+    # The first candidate seeds the running best, avoiding optional state.
+    best_codes, best_scale, best_error = evaluate(candidates[0])
+    best_index = torch.zeros((out_features, n_groups), dtype=torch.long, device=device)
 
+    for index, factor in enumerate(candidates[1:], start=1):
+        codes, ideal, err = evaluate(factor)
         improved = err < best_error
         broadcast = improved.unsqueeze(-1)
         best_error = torch.where(improved, err, best_error)
         best_codes = torch.where(broadcast, codes, best_codes)
-        best_scale = torch.where(broadcast, ideal_scale, best_scale)
-        best_index = torch.where(
-            improved, torch.full_like(best_index, index), best_index
-        )
-
-    assert best_codes is not None and best_scale is not None and best_index is not None
+        best_scale = torch.where(broadcast, ideal, best_scale)
+        best_index = torch.where(improved, torch.full_like(best_index, index), best_index)
 
     # Final stored tensors, built from the deployed FP8 scale.
     stored_scale = round_to_fp8_e4m3(best_scale * gs_scalar).squeeze(-1)
