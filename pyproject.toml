@@ -1,0 +1,44 @@
+[project]
+name = "qwen38-quasar"
+version = "0.0.1"
+description = "QUASAR NVFP4 QAT for Qwen3.8-derived models, starting with EfficientThink"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "torch",
+    "transformers",
+    "accelerate",
+    "huggingface-hub",
+    "datasets",
+    "safetensors",
+    "compressed-tensors",
+    "numpy",
+]
+
+[project.scripts]
+qwen38-quasar = "qwen38_quasar.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "ty",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qwen38_quasar"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
